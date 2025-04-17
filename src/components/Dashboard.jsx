@@ -1,5 +1,8 @@
 import React from "react";
+import { getAuth,signOut } from "firebase/auth";
 import { Link } from "react-router-dom";
+import { app } from "../firebase/firebase.config";
+import { useNavigate } from "react-router-dom";
 import {
     UserGroupIcon,
     CurrencyDollarIcon,
@@ -29,23 +32,33 @@ const data = [
 
 
 const Dashboard = () => {
+    const auth = getAuth(app);
+    const navigate = useNavigate();
     return (
         <div className="flex h-screen bg-gray-100">
-            <div className="flex flex-col items-start justify-between w-0.5/3 h-screen max-w-screen-lg bg-white shadow-lg p-8">
-                <aside className="w-64 bg-gray-900 text-white p-5 h-screen">
+            <aside className="w-64 bg-gray-900 text-white p-5 h-screen">
                     <h2 className="text-2xl font-bold mb-8">🎬 Movie Library</h2>
                     <nav className="space-y-4 text-center font-extrabold">
                         <Link to="/dashboard" className="block hover:text-yellow-400 ">Dashboard</Link>
                         <Link to="/profile" className="block hover:text-yellow-400">Profile</Link>
                         <Link to="/movies" className="block hover:text-yellow-400">Movies</Link>
                         <Link to="/notifications" className="block hover:text-yellow-400">Notifications</Link>
-                        <div className="mt-8 ">
-                            <Link to="/login" className="block text-sm hover:text-yellow-400 my-6">Login</Link>
-                            <Link to="/signup" className="block text-sm hover:text-yellow-400">Sign Up</Link>
+                        <div className="mt-10 border-t border-gray-700 pt-4">
+                            <button
+                                onClick={() => {
+                                    signOut(auth)
+                                        .then(() => {
+                                            console.log("User signed out");
+                                            navigate("/login");
+                                        })
+                                        .catch((error) => {
+                                            console.error("Error signing out:", error);
+                                        });
+                                }}
+                                className="text-red-500 hover:text-red-400">SignOut</button>
                         </div>
                     </nav>
                 </aside>
-            </div>
 
             {/* Main Content */}
             <main className="flex-1 p-6 overflow-auto">

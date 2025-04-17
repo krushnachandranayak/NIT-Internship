@@ -1,37 +1,45 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React,{useState} from "react";
+import { Link,useNavigate } from "react-router-dom";
+import {getAuth, signInWithEmailAndPassword} from "firebase/auth";
+import {app} from "../firebase/firebase.config";
 
 const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const auth = getAuth(app);
+  const navigate = useNavigate();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      console.log("User signed in:", user);
+      alert("User signed in successfully!");
+      navigate("/dashboard"); // Redirect to dashboard after login
+    } catch (error) {
+      console.error("Error signing in:", error);
+      alert("Error signing in. Please check your credentials.");
+    }
+  };
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-green-100 to-blue-200">
-      <div className="flex flex-col items-start justify-between w-0.5/3 h-screen max-w-screen-lg bg-gradient-to-b from-green-100 to-blue-200 shadow-lg p-8">
-        <aside className="w-64 bg-gray-900 text-white p-5 h-screen">
-          <h2 className="text-2xl font-bold mb-8">🎬 Movie Library</h2>
-          <nav className="space-y-4 text-center font-extrabold">
-            <Link to="/dashboard" className="block hover:text-yellow-400">Dashboard</Link>
-            <Link to="*" className="block hover:text-yellow-400">Profile</Link>
-            <Link to="/movies" className="block hover:text-yellow-400">Movies</Link>
-            <Link to="*" className="block hover:text-yellow-400">Notifications</Link>
-            <div className="mt-8">
-              <Link to="/login" className="block text-sm hover:text-yellow-400 my-6">Login</Link>
-              <Link to="/signup" className="block text-sm hover:text-yellow-400">Sign Up</Link>
-            </div>
-          </nav>
-        </aside>
-      </div>
-      <div className="items-center justify-center flex-1 flex flex-col p-8">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-center text-green-700">Login</h2>
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <input
             type="email"
             placeholder="Email"
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-300"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
           <input
             type="password"
             placeholder="Password"
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-300"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+
           />
           <button
             type="submit"
@@ -47,7 +55,6 @@ const Login = () => {
             Sign Up
           </Link>
         </p>
-      </div>
       </div>
     </div>
   );
